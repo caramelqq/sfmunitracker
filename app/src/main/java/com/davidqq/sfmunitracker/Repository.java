@@ -72,28 +72,19 @@ public class Repository {
     }
 
     /**
-    Coordinates - Route coordinates
-        void insertCoordinate(Coordinates coordinates)
-            inserts a coordinate into the db
-        void getRouteCoordinates(String routeTag)
-            uses the static class GetRouteCoordinatesFromDB
-            gets coordinates from database given a route tag
-            adds coordinates to a maps overlay
-        static class GetRouteCoordinatesFromDB extends AsyncTask<String, Void, List<Coordinates>>
-        void deleteAllCoordinates()
-            deletes all coordinates from db
-
-    Route functions - Route shows where the stops are
-        void insertRoute(Routes route)
-            inserts route in the db
-        void deleteAllRoutes()
-            deletes all routes
+     * Table of contents
+     * COORDINATE FUNCTIONS
+     * ROUTE/STOP FUNCTIONS
+     * DIRECTIONS FUNCTIONS
+     * ROUTE TITLE FUNCTIONS
+     * NETWORK API FUNCTIONS
+     * LiveData getter functions
      */
 
     /**
-     * BEGIN COORDINATE FUNCTIONS
+     * COORDINATE FUNCTIONS
+     * Insert coordinate into DB
      */
-
     public void insertCoordinate(Coordinates coordinates) {
         new AsyncTask<Coordinates, Void, Void>() {
             @Override
@@ -104,12 +95,20 @@ public class Repository {
         }.execute(coordinates);
     }
 
+    /**
+     * COORDINATE FUNCTIONS
+     * Wrapper function to execute asynctask GetRouteCoordinatesFromDBHelper
+     */
     public void getRouteCoordinatesFromDB(String routeTag) {
         Log.d("drawroutes", "getting coordinates for line: " + routeTag);
         GetRouteCoordinatesFromDBHelper t = new GetRouteCoordinatesFromDBHelper(coordinatesDao);
         t.execute(routeTag);
     }
 
+    /**
+     * COORDINATE FUNCTIONS
+     * Queries route coordinates from DB
+     */
     private class GetRouteCoordinatesFromDBHelper extends AsyncTask<String, Void, List<Coordinates>> {
         private CoordinatesDao coordinatesDao;
 
@@ -126,13 +125,12 @@ public class Repository {
         protected void onPostExecute(List<Coordinates> coordinates) {
             Log.d("drawroutes", "Repository got coords, setting into listOfCoordinates");
             listOfCoordinates.setValue(coordinates);
-            for(Coordinates c : coordinates) {
-                Log.d("drawroutes", c.getLat() + ", " + c.getLon());
-                break;
-            }
         }
     }
-
+    /**
+     * COORDINATE FUNCTIONS
+     * Deletes all coordinates in DB
+     */
     public void deleteAllCoordinates() {
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -144,13 +142,8 @@ public class Repository {
     }
 
     /**
-     * BEGIN ROUTE/STOP FUNCTIONS
-     *
-     * void insertStop(Stops stops)
-     * void getStopsDataFromDB(String routeTag)
-     *      class GetStopsDataFromDBHelper extends AsyncTask<String, Void, List<StopsWithDirection>>
-     * void deleteAllStops()
-     *
+     * ROUTE/STOP FUNCTIONS
+     * Insert stop into DB
      */
     public void insertStop(Stops stops) {
         new AsyncTask<Stops, Void, Void>() {
@@ -162,12 +155,20 @@ public class Repository {
         }.execute(stops);
     }
 
+    /**
+     * ROUTE/STOP FUNCTIONS
+     * Wrapper function to execute asynctask GetStopsDataFromDBHelper
+     */
     public void getStopsDataFromDB(String routeTag) {
         Log.d("stops", "repository - getstopsdatafromdb");
         GetStopsDataFromDBHelper t = new GetStopsDataFromDBHelper(stopsDao);
         t.execute(routeTag);
     }
 
+    /**
+     * ROUTE/STOP FUNCTIONS
+     * Queries stop data from DB
+     */
     private class GetStopsDataFromDBHelper extends AsyncTask<String, Void, List<StopsWithDirection>> {
         StopsDao stopsDao;
 
@@ -186,6 +187,10 @@ public class Repository {
         }
     }
 
+    /**
+     * ROUTE/STOP FUNCTIONS
+     * Deletes all stop information from DB
+     */
     public void deleteAllStops() {
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -197,7 +202,8 @@ public class Repository {
     }
 
     /**
-     * BEGIN DIRECTIONS FUNCTIONS
+     * DIRECTIONS FUNCTIONS
+     * Insert directions into DB
      */
     public void insertDirections(Directions directions) {
         new AsyncTask<Directions, Void, Void>() {
@@ -209,6 +215,10 @@ public class Repository {
         }.execute(directions);
     }
 
+    /**
+     * DIRECTIONS FUNCTIONS
+     * Delete all directions from DB
+     */
     public void deleteAllDirections() {
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -220,7 +230,8 @@ public class Repository {
     }
 
     /**
-     * BEGIN ROUTE TITLE FUNCTIONS
+     * ROUTE TITLE FUNCTIONS
+     * Insert route titles into DB
      */
     public void insertRouteTitle(RouteTitle routeTitle) {
         new AsyncTask<RouteTitle, Void, Void>() {
@@ -232,12 +243,19 @@ public class Repository {
         }.execute(routeTitle);
     }
 
+    /**
+     * ROUTE TITLE FUNCTIONS
+     * Wrapper to execute asynctask GetRouteTitleFromDBHelper
+     */
     public void getRouteTitleFromDB() {
         Log.d("routeTitle", "repository - getRouteTitleFromDB");
         GetRouteTitleFromDBHelper t = new GetRouteTitleFromDBHelper(routeTitleDao);
         t.execute();
     }
-
+    /**
+     * ROUTE TITLE FUNCTIONS
+     * Queries database for route titles
+     */
     private class GetRouteTitleFromDBHelper extends AsyncTask<Void, Void, List<RouteTitle>> {
         RouteTitleDao routeTitleDao;
 
@@ -252,16 +270,14 @@ public class Repository {
 
         @Override
         protected void onPostExecute(List<RouteTitle> routes) {
-            /*
-            for(RouteTitle r : routes) {
-                Log.d("routeTitle", r.getRouteTag() + " " + r.getRouteTitle());
-            }
-
-             */
             routeTitles.setValue(routes);
         }
     }
 
+    /**
+     * ROUTE TITLE FUNCTIONS
+     * Delete all route title information
+     */
     public void deleteAllRouteTitles() {
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -273,7 +289,8 @@ public class Repository {
     }
 
     /**
-     * BEGIN NETWORK API FUNCTIONS
+     * NETWORK API FUNCTIONS
+     * Gets vehicle locations from nextbus api
      */
     public void getVehicleLocations(String routeTag, String time) {
         Call<VehicleLocations> call = xmlApi.getVehicleLocation(routeTag, time);
@@ -293,6 +310,10 @@ public class Repository {
         });
     }
 
+    /**
+     * NETWORK API FUNCTIONS
+     * Gets route name information from nextbus api
+     */
     public void getRouteNames() {
         Call<RouteNames> call = xmlApi.getRouteNames();
 
@@ -317,6 +338,11 @@ public class Repository {
         });
     }
 
+    /**
+     * NETWORK API FUNCTIONS
+     * Get all bus route coordinates and information from nextbus api
+     * On successful query, dump out old data and insert new data into DB
+     */
     public void getAllBusRoutes() {
         Call<BusRoute> call = xmlApi.getAllRoutes();
 
@@ -375,7 +401,7 @@ public class Repository {
                     }
                     Log.d("getallbusroutes", "Finished adding data to db.");
                 } else {
-                    Log.e("getallbusroutes", "onResponse: Fail ");
+                    Log.e("getallbusroutes", "onResponse: HTTP error getting route data?");
                 }
             }
 
@@ -387,7 +413,7 @@ public class Repository {
     }
 
     /**
-        LiveData getter functions
+     * LiveData getter functions
      */
 
     public MutableLiveData<VehicleLocations> getLocationsLiveData() {
